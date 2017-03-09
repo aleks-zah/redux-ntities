@@ -1,10 +1,9 @@
 // @flow
 import { curryN } from 'ramda';
-import { REQUEST_SUCCESS } from '../../hoc/fetcher/actions';
-import { SYNC_START } from '../../hoc/sync/actions';
-import type { RequestEntityWithPayloadType } from '../../hoc/sync/actions';
-import { updateEntities } from '../../index';
-import type { MapType, GenericEntityType } from '../../index';
+import type { MapType, GenericEntityType, RequestEntityWithPayloadType } from 'redux-ntities';
+import { REQUEST_SUCCESS } from '../hoc/fetcher/actions';
+import { SYNC_START } from '../hoc/sync/actions';
+import { updateEntities } from '../index';
 
 type EntitiesStateType = MapType<Array<GenericEntityType>>;
 

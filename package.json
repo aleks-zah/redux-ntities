@@ -1,13 +1,14 @@
 {
   "name": "redux-ntities",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "description": "Redux entities manager",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "lint": "eslint src --cache --fix",
     "lint:watch": "esw -w --cache --fix src",
     "flow": "flow check",
-    "build": "cross-env BABEL_ENV=cjs babel -d lib/ src/"
+    "build": "cross-env BABEL_ENV=cjs babel -d lib/ src/",
+    "prepublish": "yarn run build"
   },
   "author": "",
   "license": "ISC",

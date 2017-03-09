@@ -1,8 +1,14 @@
 // @flow
 import type { Dispatch } from 'redux';
-import type { RequestEntityType, RequestActionType, RequestStartType } from '../hoc/fetcher/actions';
-import type { SyncActionType, SyncStartType } from '../hoc/sync/actions';
-import type { MapType, GenericEntityType } from '../index';
+import type {
+    MapType,
+    GenericEntityType,
+    RequestEntityType,
+    RequestActionType,
+    RequestStartType,
+    SyncStartType,
+    SyncActionType,
+} from 'redux-ntities';
 import { requestSuccess, requestFail, requestStart } from '../hoc/fetcher/actions';
 import { syncSuccess, syncFail } from '../hoc/sync/actions';
 import { requestIdleCallback } from '../internal';

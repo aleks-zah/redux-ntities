@@ -1,12 +1,12 @@
 // @flow
+import type { MapType } from 'redux-ntities';
 import { INVALID_ENTITY } from '../index';
-import type { MapType } from '../index';
 
 export const validate = (prop: *, expectedType: string): void => {
     const actualType = typeof prop;
 
     if (typeof prop !== expectedType) { // eslint-disable-line
-        throw new Error(`Redux-ntities hoc: ${prop} is ${actualType}, expected ${expectedType}`);
+        throw new Error(`Redux-ntities hoc: ${JSON.stringify(prop)} is ${actualType}, expected ${expectedType}`);
     }
 };
 

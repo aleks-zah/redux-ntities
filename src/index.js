@@ -1,10 +1,14 @@
+// @flow
 import { find, map, ifElse, union } from 'ramda';
+import type { GenericEntityType, PayloadType } from 'redux-ntities';
+import middlewareCreator from './middleware';
+import fetchHOCCreator from './hoc/fetcher/index';
+import syncHOCCreator from './hoc/sync/index';
+import partialReducer from './reducer';
+import { syncFail, syncStart, syncSuccess } from './hoc/sync/actions';
+import { requestStart, requestFail, requestSuccess, hydrateEntities } from './hoc/fetcher/actions';
 
 export const INVALID_ENTITY = 'INVALID_ENTITY';
-
-export type GenericEntityType = { id: string | number };
-export type PayloadType = $Shape<GenericEntityType>;
-export type MapType<E> = { [string]: E };
 
 export const withId = (id: string | number) => (entity: GenericEntityType): boolean => entity.id === id;
 
@@ -17,3 +21,15 @@ export const updateEntities = (payload: PayloadType) => ifElse(
     ),
     union([payload]),
 );
+
+const actions = {
+    syncFail,
+    syncStart,
+    syncSuccess,
+    requestStart,
+    requestFail,
+    requestSuccess,
+    hydrateEntities,
+};
+
+export { middlewareCreator, fetchHOCCreator, syncHOCCreator, partialReducer, actions };

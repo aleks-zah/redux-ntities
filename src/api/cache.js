@@ -1,8 +1,10 @@
 // @flow
 import localforage from 'localforage';
+import type {
+    GenericEntityType,
+    RequestEntityType,
+} from 'redux-ntities';
 import { INVALID_ENTITY, updateEntities } from '../index';
-import type { GenericEntityType } from '../index';
-import type { RequestEntityType } from '../hoc/fetcher/actions';
 
 localforage.setDriver([localforage.INDEXEDDB, localforage.LOCALSTORAGE]);
 

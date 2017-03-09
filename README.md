@@ -39,10 +39,10 @@ Then, inside your configureStore module:
 ```javascript
 import { createStore, applyMiddleware } from 'redux';
 import transforms from './transforms';
-import entitiesMwCreator from 'redux-ntities/lib/middleware';
+import { middlewareCreator as entitiesMiddlewareCreator } from 'redux-ntities';
 
 const createStore = applyMiddleware(
-    entitiesMwCreator(transforms),
+    entitiesMiddlewareCreator(transforms),
 )(createStore);
 
 const store = createStore(initialState);
@@ -77,8 +77,7 @@ export const syncEntityIdSelector = {
 // template.js
 import { connect } from 'react-redux';
 import { compose } from 'ramda';
-import fetcherCreator from 'redux-ntities/lib/hoc/fetcher';
-import sync from 'redux-ntities/lib/hoc/sync';
+import { fetchHOCCreator, syncHOCCreator } from 'redux-ntities';
 import { TEMPLATE } from './entities';
 import {
     mapEntitiesToSyncRestUrl,
@@ -92,13 +91,13 @@ const mapStateToProps = (state, props) => ({
     template: templateSelector(state, props),
 });
 
-const fetcher = fetcherCreator({
+const fetcher = fetchHOCCreator({
     useCache: true,
     mapEntitiesToRestUrl,
     entityIdSelector,
 });
 
-const sync = syncCreator({
+const sync = syncHOCCreator({
     mapEntitiesToRestUrl: mapEntitiesToSyncRestUrl,
     entityIdSelector: syncEntityIdSelector
 });
@@ -121,5 +120,3 @@ export default enhancer(Template);
 - Consider changing shitty generic namings like entity
 - Handle invalid entities more concisely
 - Handle failed HTTP requests more concisely
-- Change inner folders structure to prevent imports of nested modules
-- Export flowtype declarations

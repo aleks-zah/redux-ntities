@@ -1,22 +1,13 @@
 // @flow
 import React, { Component } from 'react';
+import type { MapType, RequestEntityType, HocType, FetcherOptionsType, EntitiesHocType } from 'redux-ntities';
 import type { Dispatch } from 'redux';
 import { INVALID_ENTITY } from '../../index';
 import { validate, getDisplayName, wrapEntityMap } from '../../internal';
-import type { MapType } from '../../index';
-import type { RequestEntityType } from './actions';
 import { requestStart, hydrateEntities } from './actions';
 
 type PropsType = {
     dispatch: Dispatch<*>
-};
-
-type HocType = (el: ReactClass<*>) => ReactClass<*>;
-
-type FetcherOptionsType = {
-    useCache: boolean,
-    mapEntitiesToRestUrl: MapType<() => string>,
-    entityIdSelector: MapType<() => string>
 };
 
 const getEntityUrl = (mapEntitiesToRestUrl: MapType<() => string>) => (props: PropsType, entity: string): string => {
@@ -33,35 +24,37 @@ export const fetcherCreator = ({
     useCache,
     mapEntitiesToRestUrl,
     entityIdSelector,
-}: FetcherOptionsType) => (entities: Array<string>): HocType => (ComposedComponent: ReactClass<*>): ReactClass<*> =>
-    class extends Component {
-        props: PropsType;
+}: FetcherOptionsType): EntitiesHocType =>
+    (entities: Array<string>): HocType =>
+        (ComposedComponent: ReactClass<*>): ReactClass<*> =>
+            class extends Component {
+                props: PropsType;
 
-        static displayName = `Fetcher(${getDisplayName(ComposedComponent)})`;
+                static displayName = `Fetcher(${getDisplayName(ComposedComponent)})`;
 
-        componentWillMount() {
-            validate(useCache, 'boolean');
-            validate(mapEntitiesToRestUrl, 'object');
-            validate(entityIdSelector, 'object');
+                componentWillMount() {
+                    validate(useCache, 'boolean');
+                    validate(mapEntitiesToRestUrl, 'object');
+                    validate(entityIdSelector, 'object');
 
-            const entityIdSelectorDecorated = wrapEntityMap(entityIdSelector);
+                    const entityIdSelectorDecorated = wrapEntityMap(entityIdSelector);
 
-            const urls = entities.map((entity: string): RequestEntityType => ({
-                url: getEntityUrl(mapEntitiesToRestUrl)(this.props, entity),
-                entityName: entity,
-                id: entityIdSelectorDecorated[entity](this.props),
-            }));
+                    const urls = entities.map((entity: string): RequestEntityType => ({
+                        url: getEntityUrl(mapEntitiesToRestUrl)(this.props, entity),
+                        entityName: entity,
+                        id: entityIdSelectorDecorated[entity](this.props),
+                    }));
 
-            const action = useCache ? hydrateEntities(urls) : requestStart(urls);
+                    const action = useCache ? hydrateEntities(urls) : requestStart(urls);
 
-            this.props.dispatch(action);
-        }
+                    this.props.dispatch(action);
+                }
 
-        render(): React$Element<*> {
-            return (
-                <ComposedComponent {...this.props} />
-            );
-        }
-    };
+                render(): React$Element<*> {
+                    return (
+                        <ComposedComponent {...this.props} />
+                    );
+                }
+            };
 
 export default fetcherCreator;
