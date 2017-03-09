@@ -1,0 +1,24 @@
+{
+  "parser": "babel-eslint",
+  "extends": "engagepoint",
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "globals": {
+    "Generator": true,
+    "$Shape": true
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "flowtype/require-return-type": [
+      2,
+      "always",
+      {
+        "excludeArrowFunctions": true
+      }
+    ],
+    "import/no-unresolved": "off",
+    "import/extensions": "off"
+  }
+}

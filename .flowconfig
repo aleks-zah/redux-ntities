@@ -1,0 +1,15 @@
+[ignore]
+.*/node_modules/babel-core/.*
+.*/node_modules/fbjs/.*
+.*/node_modules/babel/.*
+
+[include]
+src/
+
+[libs]
+flow-typed
+
+[options]
+esproposal.class_instance_fields=enable
+esproposal.class_static_fields=enable
+module.system=haste
