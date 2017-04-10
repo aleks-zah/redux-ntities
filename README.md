@@ -1,9 +1,9 @@
 # Redux-ntities
 
-This is redux entities management library. It consists of 2 HOCs and
-redux middleware. It allows you to persist your entities in
-IndexedDB/localStorage and provides common approach to save your entites
-in redux state.
+This is redux entities management library for backendless applications.
+It consists of 2 HOCs and redux middleware. It allows you to persist your
+entities in IndexedDB/localStorage and provides common approach to save
+your entities in redux state.
 
 ## Installation
 
@@ -117,6 +117,4 @@ export default enhancer(Template);
 ```
 
 #### TODO
-- Consider changing shitty generic namings like entity
-- Handle invalid entities more concisely
-- Handle failed HTTP requests more concisely
+- Process requests inside webworkers

@@ -7,3 +7,4 @@ npm-debug.log
 .babelrc
 flow-typed
 .eslintrc
+src

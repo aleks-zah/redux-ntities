@@ -21,8 +21,12 @@ const getOptions: RequestOptions = {
     headers: {
         'Content-Type': 'application/json',
     },
-    timeout: 28000,
+    timeout: 10000,
 };
+
+const RETRY_TIMEOUT = 5000;
+const pendingRequestsMap = {};
+const pendingSyncsMap = {};
 
 const putOptions = (body: *): RequestOptions => ({
     ...getOptions,
@@ -37,13 +41,41 @@ const toPersistenceShape = (entity: RequestEntityType) => (e: *) => ({
     payload: e,
 });
 
+type PendingResponseType = {
+    response: Response,
+    json: Promise<*>
+};
+
+const fetchWrapper = (url: string, options: RequestOptions) =>
+    new Promise((resolve: () => void, reject: () => void) => {
+        fetch(url, options)
+            .then((response: Response) => response.json().then((json: *) => ({
+                json,
+                response,
+            })))
+            .then(({ response, json }: PendingResponseType): void => {
+                if (!response.ok) {
+                    const error = {
+                        ...json,
+                        status: response.status,
+                    };
+
+                    return reject(error);
+                }
+
+                return resolve(json);
+            })
+            .catch((err: Error) => {
+                reject(err);
+            });
+    });
+
 const callRequestApiBase = (
     dispatch: Dispatch<RequestActionType>,
     entity: RequestEntityType,
     options: RequestOptions,
     transforms: MapType<() => $Shape<GenericEntityType>>,
-) => fetch(entity.url, options)
-    .then((response: Response): Promise<*> => response.json())
+) => fetchWrapper(entity.url, options)
     .then((json: *) => {
         const maybeTransform = transforms[entity.entityName];
         const transform = typeof maybeTransform === 'function' ? maybeTransform : identity;
@@ -56,21 +88,31 @@ const callRequestApiBase = (
         });
     })
     .catch((err: Error) => {
+        if (typeof err.status === 'undefined') {
+            if (pendingRequestsMap[entity.url]) clearTimeout(pendingRequestsMap[entity.url]);
+
+            pendingRequestsMap[entity.url] =
+                setTimeout(callRequestApiBase, RETRY_TIMEOUT, dispatch, entity, options, transforms);
+        }
+
         dispatch(requestFail(entity, err));
     });
 
 const callSyncApiBase = (dispatch: Dispatch<SyncActionType>, action: SyncStartType, options: RequestOptions) =>
     Promise.all([
         persistEntity({ entityName: action.entity.entityName, payload: action.payload }),
-        fetch(action.entity.url, options)
-            .then((response: Response): Promise<*> => response.json())
+        fetchWrapper(action.entity.url, options)
             .then(() => {
                 dispatch(syncSuccess(action.entity));
             })
             .catch((err: Error) => {
-                // failures: [validation fail, cant process entity => maybe 4** statusCode?]
-                // @todo define HTTP status and do not use failure action if server is not available
-                // @todo somehow revert state to previous in case of failure
+                if (typeof err.status === 'undefined') {
+                    if (pendingSyncsMap[action.entity.url]) clearTimeout(pendingSyncsMap[action.entity.url]);
+
+                    pendingSyncsMap[action.entity.url] =
+                        setTimeout(callRequestApiBase, RETRY_TIMEOUT, dispatch, action, options);
+                }
+
                 dispatch(syncFail(action.entity, err));
             }),
     ]);
